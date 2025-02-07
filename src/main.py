@@ -24,19 +24,21 @@ init.controlled_init(grid)
 
 # Variables de contrôle du jeu
 simulation_running = False
+vitesse_simulation = 5
 
 # Boucle principale du jeu
 running = True
 while running:
     screen.fill((0, 0, 0))  # Remplir l'écran de noir
     dis.draw_grid(grid, screen)  # Afficher la grille
-    # mettre_a_jour = True
 
     # Dessiner le bouton
     button_start_rect = dis.draw_start_button(screen)
     button_stop_rect = dis.draw_stop_button(screen)
     button_init_null_rect = dis.draw_initialize_null_button(screen)
     button_init_full_rect = dis.draw_initialize_button(screen)
+    button_faster_rect = dis.draw_faster_button(screen)
+    button_slower_rect = dis.draw_slower_button(screen)
 
     # Gestion des événements
     for event in pygame.event.get():
@@ -47,29 +49,35 @@ while running:
             if button_start_rect.collidepoint(event.pos):  # Vérifier si le clic est sur le bouton
                 simulation_running = True  # Lancer la simulation
         
-        if event.type == pygame.MOUSEBUTTONUP:
-            if button_stop_rect.collidepoint(event.pos):  # Vérifier si le clic est sur le bouton
+            elif button_stop_rect.collidepoint(event.pos):  # Vérifier si le clic est sur le bouton
                 simulation_running = False  # Lancer la simulation
         
-        if event.type == pygame.MOUSEBUTTONUP:
-            if button_init_null_rect.collidepoint(event.pos):  # Vérifier si le clic est sur le bouton
-                screen.fill((0, 0, 0))
+            elif button_init_null_rect.collidepoint(event.pos):  # Vérifier si le clic est sur le bouton
+                grid.fill(0)
+                dis.draw_grid(grid, screen)
                 pygame.display.flip()  # Mettre à jour l'affichage
-                # mettre_a_jour = False
                 simulation_running = False
 
-        if event.type == pygame.MOUSEBUTTONUP:
-            if button_init_full_rect.collidepoint(event.pos):  # Vérifier si le clic est sur le bouton
+            elif button_init_full_rect.collidepoint(event.pos):  # Vérifier si le clic est sur le bouton
                 init.controlled_init(grid)
+                dis.draw_grid(grid, screen)
                 pygame.display.flip()  # Mettre à jour l'affichage
-                # mettre_a_jour = False
                 simulation_running = False
+
+            elif button_faster_rect.collidepoint(event.pos):
+                vitesse_simulation += 1
+                print(vitesse_simulation)
+            
+            elif button_slower_rect.collidepoint(event.pos):
+                vitesse_simulation -= 1
+                print(vitesse_simulation)
+
 
     # Si la simulation est lancée, calculer la génération suivante
     if simulation_running:
         grid = ggen.next_generation(grid)
 
     pygame.display.flip()  # Mettre à jour l'affichage
-    clock.tick(5)  # Limiter à 10 images par seconde
+    clock.tick(vitesse_simulation)  # Limiter à 10 images par seconde
 
 pygame.quit()

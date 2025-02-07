@@ -52,3 +52,23 @@ def draw_initialize_button(screen):
     screen.blit(text, (BOARD_WIDTH - 110 + text.get_width() // 2, TOTAL_HEIGH - 35 + text.get_height() // 2))
 
     return button_rect
+
+def draw_faster_button(screen) :
+    button_color = (125, 125, 0)
+    button_rect = pygame.Rect(BOARD_WIDTH // 2 - 40, TOTAL_HEIGH - 35, 30, 30)
+    pygame.draw.rect(screen, button_color, button_rect)
+    font = pygame.font.Font(None, 25)
+    text = font.render("+", True, (255, 255, 255))
+    screen.blit(text, (BOARD_WIDTH // 2 - 30 + text.get_width() // 2, TOTAL_HEIGH - 35 + text.get_height() // 2))
+
+    return button_rect
+
+def draw_slower_button(screen) :
+    button_color = (0, 125, 125)
+    button_rect = pygame.Rect(BOARD_WIDTH // 2 + 10, TOTAL_HEIGH - 35, 30, 30)
+    pygame.draw.rect(screen, button_color, button_rect)
+    font = pygame.font.Font(None, 25)
+    text = font.render("-", True, (255, 255, 255))
+    screen.blit(text, (BOARD_WIDTH // 2 + 30 - text.get_width() // 2, TOTAL_HEIGH - 35 + text.get_height() // 2))
+
+    return button_rect

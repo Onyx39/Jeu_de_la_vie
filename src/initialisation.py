@@ -4,11 +4,13 @@ from constants import ROWS, COLS
 
 # Fonction pour initialiser quelques cellules vivantes
 def random_init(grid):
+    grid.fill(0)
     for i in range(ROWS):
         for j in range(COLS):
             grid[i, j] = np.random.choice([0, 1])  # Cellule morte (0) ou vivante (1)
 
 def controlled_init(grid):
+    grid.fill(0)
     # clignotant
     # grid[2, 2] = 1
     # grid[2, 3] = 1
@@ -66,4 +68,3 @@ def controlled_init(grid):
     grid[34, 3] = 1
     grid[35, 2] = 1
     grid[35, 3] = 1
-    # grid[0, 0] = 1
