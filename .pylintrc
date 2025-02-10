@@ -1,0 +1,3 @@
+# Ignore les erreurs E1101 reliées à PyGame
+[TYPECHECK]
+ignored-modules=pygame

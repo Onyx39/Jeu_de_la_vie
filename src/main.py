@@ -1,83 +1,96 @@
+"""
+Fichier principal, exécutable
+"""
+
 import pygame
 import numpy as np
 
 import gestion_generation as ggen
 import initialisation as init
-import display as dis
-from constants import BOARD_WIDTH, TOTAL_HEIGH, ROWS, COLS
+import affichage as aff
+from constantes import LARGEUR_PLATEAU, HAUTEUR_PLATEAU, HAUTEUR_TOTAL, COLLONNES, LIGNES
 
 
 # Initialiser Pygame
 pygame.init()
-screen = pygame.display.set_mode((BOARD_WIDTH, TOTAL_HEIGH))
+ecran = pygame.display.set_mode((LARGEUR_PLATEAU, HAUTEUR_TOTAL))
 pygame.display.set_caption("Jeu de la Vie")
-clock = pygame.time.Clock()
+horloge = pygame.time.Clock()
 
-# Créer une grille vide (toutes les cellules mortes)
-grid = np.zeros((ROWS, COLS), dtype=int)
+# Créer une grille vide
+grille = np.zeros((LIGNES, COLLONNES), dtype=int)
 
-
-# Initialisation aléatoire des cellules vivantes
-# random_init(grid)
-init.controlled_init(grid)
-
+# Initialisation des cellules vivantes
+init.initialisation_controlee(grille)
 
 # Variables de contrôle du jeu
-simulation_running = False
-vitesse_simulation = 5
+SIMULATION_EN_COURS = False
+VITESSE_SIMULATION = 5
 
 # Boucle principale du jeu
-running = True
-while running:
-    screen.fill((0, 0, 0))  # Remplir l'écran de noir
-    dis.draw_grid(grid, screen)  # Afficher la grille
+ACTIVE = True
+while ACTIVE:
+    ecran.fill((0, 0, 0))
+    aff.dessiner_grille(grille, ecran)
 
-    # Dessiner le bouton
-    button_start_rect = dis.draw_start_button(screen)
-    button_stop_rect = dis.draw_stop_button(screen)
-    button_init_null_rect = dis.draw_initialize_null_button(screen)
-    button_init_full_rect = dis.draw_initialize_button(screen)
-    button_faster_rect = dis.draw_faster_button(screen)
-    button_slower_rect = dis.draw_slower_button(screen)
+    # Dessiner les boutons
+    bouton_commencer_rect = aff.dessiner_bouton_commencer(ecran)
+    bouton_arreter_rect = aff.dessiner_bouton_arreter(ecran)
+    bouton_init_vide_rect = aff.dessiner_bouton_init_vide(ecran)
+    bouton_init_rect = aff.dessiner_bouton_init(ecran)
+    bouton_accelerer_rect = aff.dessiner_bouton_accelerer(ecran)
+    bouton_ralentir_rect = aff.dessiner_bouton_ralentir(ecran)
 
     # Gestion des événements
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            running = False
-            
+            ACTIVE = False
+
         if event.type == pygame.MOUSEBUTTONUP:
-            if button_start_rect.collidepoint(event.pos):  # Vérifier si le clic est sur le bouton
-                simulation_running = True  # Lancer la simulation
-        
-            elif button_stop_rect.collidepoint(event.pos):  # Vérifier si le clic est sur le bouton
-                simulation_running = False  # Lancer la simulation
-        
-            elif button_init_null_rect.collidepoint(event.pos):  # Vérifier si le clic est sur le bouton
-                grid.fill(0)
-                dis.draw_grid(grid, screen)
-                pygame.display.flip()  # Mettre à jour l'affichage
-                simulation_running = False
+            if bouton_commencer_rect.collidepoint(event.pos) :
+                SIMULATION_EN_COURS = True
 
-            elif button_init_full_rect.collidepoint(event.pos):  # Vérifier si le clic est sur le bouton
-                init.controlled_init(grid)
-                dis.draw_grid(grid, screen)
-                pygame.display.flip()  # Mettre à jour l'affichage
-                simulation_running = False
+            elif bouton_arreter_rect.collidepoint(event.pos) :
+                SIMULATION_EN_COURS = False
 
-            elif button_faster_rect.collidepoint(event.pos):
-                vitesse_simulation += 1
-                print(vitesse_simulation)
-            
-            elif button_slower_rect.collidepoint(event.pos):
-                vitesse_simulation -= 1
-                print(vitesse_simulation)
+            elif bouton_init_vide_rect.collidepoint(event.pos) :
+                grille.fill(0)
+                aff.dessiner_grille(grille, ecran)
+                SIMULATION_EN_COURS = False
+
+            elif bouton_init_rect.collidepoint(event.pos) :
+                init.initialisation_controlee(grille)
+                aff.dessiner_grille(grille, ecran)
+                SIMULATION_EN_COURS = False
+
+            elif bouton_accelerer_rect.collidepoint(event.pos) :
+                VITESSE_SIMULATION += 1
+
+            elif bouton_ralentir_rect.collidepoint(event.pos) :
+                VITESSE_SIMULATION -= 1
+
+            # Gérer les clics sur la grille pour changer l'état des cellules
+            elif not SIMULATION_EN_COURS :
+                LARGEUR_CELLULE = LARGEUR_PLATEAU // COLLONNES
+                HAUTEUR_CELLULE = HAUTEUR_PLATEAU // LIGNES
+                x, y = event.pos
+
+                colonne = x // LARGEUR_CELLULE
+                ligne = y // HAUTEUR_CELLULE
+
+                if grille[ligne, colonne] == 0 :
+                    grille[ligne, colonne] = 1
+                else :
+                    grille[ligne, colonne] = 0
+
+                aff.dessiner_grille(grille, ecran)
 
 
     # Si la simulation est lancée, calculer la génération suivante
-    if simulation_running:
-        grid = ggen.next_generation(grid)
+    if SIMULATION_EN_COURS:
+        grille = ggen.prochaine_generation(grille)
 
-    pygame.display.flip()  # Mettre à jour l'affichage
-    clock.tick(vitesse_simulation)  # Limiter à 10 images par seconde
+    pygame.display.flip()
+    horloge.tick(VITESSE_SIMULATION)
 
 pygame.quit()
